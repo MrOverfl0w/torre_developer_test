@@ -7,7 +7,7 @@
         </div>
         <div class="buscar">
             <b-form-input v-model="skill" placeholder="Search by skill" name="skill"></b-form-input>
-            <b-button>Search Mentor</b-button>
+            <b-button v-on:click="postreq()">Search Mentor</b-button>
         </div>
         <div class="signin"><a href="https://accounts.torre.co/email/?next=/openid/authorize%3Fscope%3Dopenid%2Bprofile%2Bemail%26response_type%3Dcode%26redirect_uri%3Dhttps%253A%252F%252Ftorre.co%252Fcallback%253Fclient_name%253Dstarrgate%26state%3DKz7-TYl8rMFi5xhMNfnBlZOJQXf6dOl2A_ZqIWRJZ4E%26intent%3Dhome%253Asign-in%26client_id%3D541493">Go to Torre</a></div>
       </b-container>
@@ -22,12 +22,11 @@
         <ul class="results">
           <li class="result" v-for="person in people" :key="person.id">
             <a :href="person.url" target="_blank">
-              <div class="user-image"><img :src="person.image" alt=""></div>
+              <div class="user-image"><img :src="person.picture" alt=""></div>
               <div class="user-content">
                 <div class="name"><span>{{ person.name }}</span></div>
                 <div class="price"><span>{{ person.price }}</span></div>
                 <div class="remote" v-if="person.remote"><span>Remote</span></div>
-                <div class="location"><span>{{ person.location }}</span></div>
               </div>
             </a>
           </li>
@@ -38,8 +37,31 @@
 </template>
 
 <script>
+
+import axios from 'axios';
+
 export default {
   name: 'MentorsFront',
+
+  data: function(){
+    return {
+      skill: "",
+      people: ""
+    }
+  },
+
+  methods: {
+    postreq: function(){
+      var data = {"skill": this.skill}
+      console.log(data);
+      axios({ method: "POST", url: "http://127.0.0.1:8090/", data: data, headers: {"content-type": "text/plain" } }).then( result => {
+        this.people = result.data["results"]
+        console.log(result.data);
+      }).catch( error => {
+        console.log(error);
+      });
+    }
+  }
 }
 </script>
 
@@ -130,7 +152,8 @@ header .container-fluid{
 .results .result > a{
   padding: 20px;
   display: grid;
-  grid-template-rows: 130px auto;
+  grid-template-columns: 130px auto;
+  text-decoration: none;
 }
 .result .user-image img{
   width: 100%;
@@ -138,20 +161,17 @@ header .container-fluid{
 .result .user-content{
   padding: 10px;
   color: #FFF;
+  align-self: center;
 }
 .user-content .name{
-  font-size: 1.5em;
+  font-size: 1.1em;
 }
 .user-content .price{
   margin-top: 5px;
-  font-size: 1.5em;
+  font-size: 0.9em;
 }
 .user-content .remote{
   margin-top: 10px;
-  font-size: 1em;
-}
-.user-content .location{
-  margin-top: 5px;
-  font-size: 1em;
+  font-size: 0.7em;
 }
 </style>
