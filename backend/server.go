@@ -69,7 +69,7 @@ func process(requestData skillSearch) listResponseData {
 				itemDataResponse.Remote = child.Path("remoter").Data().(bool)
 				itemDataResponse.Location = child.Path("locationName").Data().(string)
 
-				listResponse.Results = append([]listItemData{itemDataResponse})
+				listResponse.Results = append(listResponse.Results, itemDataResponse)
 			}
 		}
 
