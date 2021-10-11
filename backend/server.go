@@ -16,10 +16,11 @@ type skillSearch struct {
 
 // Output
 type listItemData struct {
-	Name     string  `json:"name"`
-	Price    float64 `json:"price"`
-	Remote   bool    `json:"remote"`
-	Location string  `json:"location"`
+	Name    string  `json:"name"`
+	Price   float64 `json:"price"`
+	Remote  bool    `json:"remote"`
+	Picture string  `json:"picture"`
+	Url     string  `json:"url"`
 }
 
 type listResponseData struct {
@@ -30,7 +31,7 @@ type listResponseData struct {
 func process(requestData skillSearch) listResponseData {
 	var listResponse listResponseData
 
-	usersjson, err := http.Post("https://search.torre.co/people/_search/?offset=0&size=1000", "", nil)
+	usersjson, err := http.Post("https://search.torre.co/people/_search/?offset=0&size=500", "", nil)
 	if err != nil {
 		log.Fatalf("Error in API: %v", err)
 	}
@@ -65,9 +66,12 @@ func process(requestData skillSearch) listResponseData {
 			if weight > 0 {
 				var itemDataResponse listItemData
 				itemDataResponse.Name = child.Path("name").Data().(string)
-				itemDataResponse.Price = child.Path("compensations").Path("employee").Path("minHourlyUSD").Data().(float64)
+				itemDataResponse.Picture = child.Path("picture").Data().(string)
+				if price := child.Path("compensations").Path("employee").Path("minHourlyUSD").Data(); price != nil {
+					itemDataResponse.Price = price.(float64)
+				}
 				itemDataResponse.Remote = child.Path("remoter").Data().(bool)
-				itemDataResponse.Location = child.Path("locationName").Data().(string)
+				itemDataResponse.Url = "https://torre.co/" + child.Path("username").Data().(string)
 
 				listResponse.Results = append(listResponse.Results, itemDataResponse)
 			}
